@@ -37,7 +37,9 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebar";
+import { ModeToggle } from "@/components/ui/mode-toggle";
 import { Skeleton } from "@/components/ui/skeleton";
 import {
   useConversations,
@@ -216,11 +218,14 @@ function ChatItem({
 
 function SidebarFooterMenu() {
   const { setTheme } = useTheme();
+  const { open } = useSidebar();
 
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <div className="flex items-center justify-between">
+        <div
+          className={`flex ${open ? " items-center justify-between" : "flex-col-reverse gap-2"}`}
+        >
           <div className="flex items-center gap-2 px-1 py-1.5">
             <UserButton
               appearance={{
@@ -234,7 +239,7 @@ function SidebarFooterMenu() {
             </span>
           </div>
 
-          <ButtonGroup className="">
+          <ButtonGroup className={cn(!open && "hidden")}>
             <Button
               size="icon-sm"
               onClick={() => setTheme("light")}
@@ -250,6 +255,8 @@ function SidebarFooterMenu() {
               <RiMoonFill />
             </Button>
           </ButtonGroup>
+
+          {!open && <ModeToggle />}
         </div>
       </SidebarMenuItem>
     </SidebarMenu>
