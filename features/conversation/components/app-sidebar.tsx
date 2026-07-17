@@ -7,13 +7,16 @@ import {
   RiPencilFill,
   RiPushpinFill,
   RiUnpinFill,
-  RiAddLine,
   RiDeleteBin7Fill,
+  RiSunFill,
+  RiMoonFill,
+  RiAddCircleFill,
 } from "@remixicon/react";
 import { UserButton } from "@clerk/nextjs";
 import { useTheme } from "next-themes";
-
+import Image from "next/image";
 import { Button } from "@/components/ui/button";
+import { ButtonGroup } from "@/components/ui/button-group";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -47,16 +50,10 @@ type Conversation = NonNullable<
   ReturnType<typeof useConversations>["data"]
 >[number];
 
-/**
- * Main application sidebar — logo, new chat, conversation list, theme toggle, and account.
- */
 export function AppSidebar() {
   const pathname = usePathname();
   const { data: conversations, isLoading } = useConversations();
 
-  // Get the active conversation id from the pathname (e.g. /c/123)
-  // pathname.split("/")[2] is the third part of the pathname (the conversation id)
-  //  firstparam = / , secondparam = c , thirdparam = 123
   const activeId = pathname.startsWith("/c/")
     ? pathname.split("/")[2]
     : undefined;
@@ -68,18 +65,15 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SidebarMenuButton
               size="lg"
-              className="font-semibold tracking-tight"
-              render={<Link href="/" />}
+              className="font-semibold tracking-tight mb-2"
             >
-              <span className="flex size-8 items-center justify-center rounded-lg bg-primary text-sm text-primary-foreground">
-                n
-              </span>
+              <Image src="/chat.png" alt="nChat" width={32} height={32} />
               <span>nChat</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
             <SidebarMenuButton tooltip="New chat" render={<Link href="/" />}>
-              <RiAddLine />
+              <RiAddCircleFill />
               <span>New chat</span>
             </SidebarMenuButton>
           </SidebarMenuItem>
@@ -88,7 +82,7 @@ export function AppSidebar() {
 
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Chats</SidebarGroupLabel>
+          <SidebarGroupLabel> Recent Chats</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               <ChatList
@@ -109,7 +103,6 @@ export function AppSidebar() {
   );
 }
 
-/** Renders the conversation list with loading skeletons or an empty-state message. */
 function ChatList({
   conversations,
   isLoading,
@@ -122,9 +115,9 @@ function ChatList({
   if (isLoading) {
     return (
       <>
-        {Array.from({ length: 5 }).map((_, index) => (
+        {Array.from({ length: 10 }).map((_, index) => (
           <SidebarMenuItem key={index}>
-            <Skeleton className="h-8 w-full" />
+            <Skeleton className="h-8 w-full mb-1" />
           </SidebarMenuItem>
         ))}
       </>
@@ -150,7 +143,6 @@ function ChatList({
   );
 }
 
-/** Single sidebar row for a conversation with rename, pin, and delete actions. */
 function ChatItem({
   conversation,
   isActive,
@@ -163,7 +155,6 @@ function ChatItem({
     isActive ? conversation.id : undefined,
   );
 
-  /** Prompts the user to rename the conversation and persists the new title. */
   function handleRename() {
     const next = window.prompt("Rename chat", conversation.title);
     if (!next || next.trim() === conversation.title) return;
@@ -171,7 +162,7 @@ function ChatItem({
   }
 
   return (
-    <SidebarMenuItem>
+    <SidebarMenuItem className="mb-1">
       <SidebarMenuButton
         isActive={isActive}
         tooltip={conversation.title}
@@ -223,35 +214,42 @@ function ChatItem({
   );
 }
 
-/** Footer menu with theme toggle and Clerk user account button. */
 function SidebarFooterMenu() {
-  const { resolvedTheme, setTheme } = useTheme();
+  const { setTheme } = useTheme();
 
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <Button
-          type="button"
-          variant="ghost"
-          size="sm"
-          className="w-full justify-start"
-          onClick={() => setTheme(resolvedTheme === "dark" ? "light" : "dark")}
-        >
-          Toggle theme
-        </Button>
-      </SidebarMenuItem>
-      <SidebarMenuItem>
-        <div className="flex items-center gap-2 px-1 py-1.5">
-          <UserButton
-            appearance={{
-              elements: {
-                avatarBox: "size-8",
-              },
-            }}
-          />
-          <span className="truncate text-sm text-muted-foreground group-data-[collapsible=icon]:hidden">
-            Account
-          </span>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 px-1 py-1.5">
+            <UserButton
+              appearance={{
+                elements: {
+                  avatarBox: "size-8",
+                },
+              }}
+            />
+            <span className="truncate text-sm text-muted-foreground group-data-[collapsible=icon]:hidden">
+              Account
+            </span>
+          </div>
+
+          <ButtonGroup className="">
+            <Button
+              size="icon-sm"
+              onClick={() => setTheme("light")}
+              className={"bg-primary dark:bg-primary/20 px-4"}
+            >
+              <RiSunFill />
+            </Button>
+            <Button
+              size="icon-sm"
+              onClick={() => setTheme("dark")}
+              className={"bg-primary/40 dark:bg-primary px-4"}
+            >
+              <RiMoonFill />
+            </Button>
+          </ButtonGroup>
         </div>
       </SidebarMenuItem>
     </SidebarMenu>

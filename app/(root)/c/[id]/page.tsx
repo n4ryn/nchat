@@ -1,4 +1,6 @@
+import { loadChatMessages } from "@/features/ai/actions/chat-store";
 import { getConversation } from "@/features/conversation/actions/conversation-actions";
+import { ConversationView } from "@/features/conversation/components/conversation-view";
 import { notFound } from "next/navigation";
 
 type ConversationPageProps = {
@@ -15,7 +17,15 @@ const ConversationPage = async function ({ params }: ConversationPageProps) {
     notFound();
   }
 
-  return <div>page {id}</div>;
+  const initialMessages = await loadChatMessages(id);
+
+  return (
+    <ConversationView
+      key={id}
+      conversationId={id}
+      initialMessages={initialMessages}
+    />
+  );
 };
 
 export default ConversationPage;
